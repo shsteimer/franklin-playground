@@ -42,6 +42,8 @@ function sampleRUM(checkpoint, data = {}) {
   };
   defer('observe');
   defer('cwv');
+
+
   try {
     window.hlx = window.hlx || {};
     if (!window.hlx.rum) {
