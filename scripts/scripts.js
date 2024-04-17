@@ -129,9 +129,21 @@ export function decorateMain(main) {
   // await loadTemplate(main);
 
   // create an undefined reference error
-  const a = undefined;
-  if (a.something) {
+  const usp = new URLSearchParams(window.location.search);
+  const errorType = usp.get('error') || 'undef';
+  if (errorType === 'undef') {
+    const a = undefined;
+    if (a.something) {
     // this can't be reached due to undefiuned red error
+    }
+  }
+  if (errorType === 'throw') {
+    throw new Error('some error we generate');
+  }
+  if (errorType === 'promise') {
+    new Promise((_, reject) => {
+      reject(new Error('some error we generate in a promise'));
+    });
   }
 
   buildAutoBlocks(main);
