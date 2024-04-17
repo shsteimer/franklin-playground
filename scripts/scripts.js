@@ -121,12 +121,19 @@ async function loadTemplate(main) {
  * @param {Element} main The main element
  */
 // eslint-disable-next-line import/prefer-default-export
-export async function decorateMain(main) {
+export function decorateMain(main) {
   // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateLinks(main);
   decorateIcons(main);
-  await loadTemplate(main);
+  // await loadTemplate(main);
+
+  // create an undefined reference error
+  const a = undefined;
+  if (a.something) {
+    // this can't be reached due to undefiuned red error
+  }
+
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
@@ -141,7 +148,7 @@ async function loadEager(doc) {
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
-    await decorateMain(main);
+    decorateMain(main);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
