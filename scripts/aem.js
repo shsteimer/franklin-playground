@@ -176,7 +176,34 @@ function init() {
   window.addEventListener('load', () => sampleRUM('load'));
 
   window.addEventListener('unhandledrejection', (event) => {
-    sampleRUM('error', { source: event.reason.sourceURL, target: event.reason.line });
+    const { source, target } = ((evt) => {
+      let src = evt.reason.sourceURL;
+      let trgt = evt.reason.line;
+      if (!src) {
+        // stack property is non-standard, but seems to exist in all browsers, checking JIC
+        if (evt.reason.stack) {
+          try {
+            const stackLine = evt.reason.stack.split('\n')[1];
+            const startIndex = stackLine.indexOf(' (') + 2;
+            const sourceUrlAndLine = stackLine.slice(startIndex, stackLine.length - 1);
+            const parts = sourceUrlAndLine.split(':');
+            trgt = parts[parts.length - 2];
+            src = parts.slice(0, -2).join(':');
+          } catch {
+            src = evt.reason.stack;
+            trgt = evt.reason.message;
+          }
+        } else {
+          trgt = evt.reason.message;
+        }
+      }
+
+      return {
+        source: src,
+        target: trgt,
+      };
+    })(event);
+    sampleRUM('error', { source, target });
   });
 
   window.addEventListener('error', (event) => {
