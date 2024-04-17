@@ -134,7 +134,7 @@ export function decorateMain(main) {
   if (errorType === 'undef') {
     const a = undefined;
     if (a.something) {
-    // this can't be reached due to undefiuned red error
+      // this can't be reached due to undefined error
     }
   }
   if (errorType === 'throw') {
