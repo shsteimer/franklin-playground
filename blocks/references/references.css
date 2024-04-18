@@ -1,11 +1,11 @@
 .references {
-  --_references-bg: var(--background-color);
-  --_references-text: var(--text-color);
+  --references-bg-color: var(--background-color);
+  --references-text-color: var(--text-color);
 }
 
 .references #references-dialog {
-  background-color: var(--_references-bg);
-  color: var(--_references-text);
+  background-color: var(--references-bg-color);
+  color: var(--references-text-color);
   position: relative;
 }
 
@@ -61,7 +61,7 @@
   width: 3px;
   height: 22px;
   display: inline-block;
-  background-color: var(--_references-text);
+  background-color: var(--references-text-color);
   rotate: 225deg;
 }
 
