@@ -1,5 +1,5 @@
 import ffetch from '../../scripts/ffetch.js';
-import { decorateIcons } from '../../scripts/aem.js';
+import { decorateIcons, sampleRUM } from '../../scripts/aem.js';
 import {
   getOrigin, checkDomain, checkBrowserDomain,
 } from '../../scripts/utils.js';
@@ -12,6 +12,20 @@ function createReference(type, link) {
       <span class="status">...</span>
       <a class="edit-link">...</a>
     `;
+  const editLink = row.querySelector('.edit-link');
+  editLink.addEventListener('click', () => {
+    sampleRUM('references:edit', {
+      source: window.location.href,
+      target: link.getAttribute('href'),
+    });
+  });
+  link.addEventListener('click', () => {
+    sampleRUM('references:view', {
+      source: window.location.href,
+      target: link.getAttribute('href'),
+    });
+  });
+
   row.prepend(link);
   return row;
 }
@@ -89,6 +103,10 @@ async function updateStatus(row) {
           status.append(publishBtn);
 
           publishBtn.addEventListener('click', () => {
+            sampleRUM('references:publish', {
+              source: window.location.href,
+              target: link.getAttribute('href'),
+            });
             confirmPrompt(link.getAttribute('href'), () => {
               publishBtn.remove();
               status.textContent = 'Publishing...';
