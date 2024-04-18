@@ -1,11 +1,12 @@
 .references {
-  --_references-bg: var(--background-color);
-  --_references-text: var(--text-color);
+  --references-bg-color: var(--background-color);
+  --references-text-color: var(--text-color);
 }
 
 .references #references-dialog {
-  background-color: var(--_references-bg);
-  color: var(--_references-text);
+  background-color: var(--references-bg-color);
+  color: var(--references-text-color);
+  position: relative;
 }
 
 .references #references-dialog[open] {
@@ -26,7 +27,7 @@
   height: 100%;
 }
 
-.references #references-dialog .references-dialog-wrapper>* {
+.references #references-dialog .references-dialog-wrapper > * {
   padding-inline: 1rem;
 }
 
@@ -60,7 +61,7 @@
   width: 3px;
   height: 22px;
   display: inline-block;
-  background-color: var(--_references-text);
+  background-color: var(--references-text-color);
   rotate: 225deg;
 }
 
@@ -82,7 +83,7 @@
 
 .references #references-dialog .references-body {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 2fr 1fr;
   grid-auto-rows: 3rem;
   gap: .5rem;
   padding-block: 2rem;
@@ -96,12 +97,53 @@
   grid-column: 1 / -1;
 }
 
-.references #references-dialog .references-body .reference-row>* {
+.references #references-dialog .references-body .reference-row > * {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
 }
 
 .references #references-dialog .references-body .reference-row.reference-header-row {
   font-weight: 700;
+}
+
+.references #references-dialog .references-body .reference-row .status .publish-reference {
+  margin: 0;
+  margin-inline-start: 8px;
+  padding: 0;
+  background: none;
+}
+
+.references #references-dialog .references-body .reference-row .status .publish-reference .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* publish prompt */
+.references #references-dialog .publish-prompt-dialog {
+  border: 1px solid var(--dark-color);
+  border-radius: 1rem;
+  width: 400px;
+}
+
+.references #references-dialog .publish-prompt-dialog::backdrop {
+  background-color: rgba(0 0 0 / 33%);
+}
+
+.references #references-dialog .publish-prompt-dialog .button-container {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.references #references-dialog .publish-prompt-dialog .prompt-msg {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.references #references-dialog .publish-prompt-dialog .publish-prompt-path {
+  font-family: var(--fixed-font-family);
+  font-weight: 500;
 }

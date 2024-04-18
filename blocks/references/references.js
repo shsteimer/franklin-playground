@@ -1,6 +1,7 @@
 import ffetch from '../../scripts/ffetch.js';
+import { decorateIcons } from '../../scripts/aem.js';
 import {
-  getOrigin, addOutsideClickListener, checkDomain, checkBrowserDomain,
+  getOrigin, checkDomain, checkBrowserDomain,
 } from '../../scripts/utils.js';
 
 function createReference(type, link) {
@@ -15,14 +16,54 @@ function createReference(type, link) {
   return row;
 }
 
+function confirmPrompt(path, successCallback) {
+  const prompt = document.createElement('dialog');
+  prompt.className = 'publish-prompt-dialog';
+  prompt.innerHTML = `
+    <form method="dialog" class="publish-prompt-form">
+      <p class="prompt-msg">Publish <span class="publish-prompt-path">${path}</span>?</p>
+      <div class="button-container">
+        <button type="submit" value="true" autofocus>Confirm</button>
+        <button type="button"  class="secondary" value="false">Cancel</button>
+      </div>
+    </div>
+  `;
+  prompt.querySelector('button[type="button"]').addEventListener('click', () => {
+    prompt.close();
+  });
+  prompt.addEventListener('close', () => {
+    if (prompt.returnValue === 'true') {
+      successCallback();
+    }
+    prompt.remove();
+  });
+  document.querySelector('#references-dialog').append(prompt);
+  prompt.showModal();
+}
+
+function closeDialog(dlg) {
+  const prompt = dlg.querySelector('.publish-prompt-dialog');
+  if (prompt) {
+    prompt.close();
+    prompt.remove();
+  }
+
+  dlg.close();
+  document.body.style.overflowY = null;
+}
+
 async function updateStatus(row) {
   const link = row.querySelector('a');
   const editLink = row.querySelector('.edit-link');
   const status = row.querySelector('.status');
-  if (checkBrowserDomain().isHlx) {
-    const curHost = window.location.hostname.split('.');
-    const repoInfo = curHost[0].split('--');
-    const ownerRepoBranch = `${repoInfo[2]}/${repoInfo[1]}/${repoInfo[0]}`;
+  const browserDomainCheck = checkBrowserDomain();
+  if (browserDomainCheck.isHlx || browserDomainCheck.isLocal) {
+    let ownerRepoBranch = 'shsteimer/franklin-playground/main';
+    if (browserDomainCheck.isHlx) {
+      const curHost = window.location.hostname.split('.');
+      const repoInfo = curHost[0].split('--');
+      ownerRepoBranch = `${repoInfo[2]}/${repoInfo[1]}/${repoInfo[0]}`;
+    }
     const statusResp = await fetch(`https://admin.hlx.page/status/${ownerRepoBranch}${link.getAttribute('href')}?editUrl=auto`);
     if (statusResp.ok) {
       const json = await statusResp.json();
@@ -39,6 +80,31 @@ async function updateStatus(row) {
           status.textContent = 'Live';
         } else if (json.preview && json.preview.status === 200) {
           status.textContent = 'Unpublished';
+          const publishBtn = document.createElement('button');
+          publishBtn.setAttribute('role', 'button');
+          publishBtn.setAttribute('title', 'Publish');
+          publishBtn.className = 'publish-reference';
+          publishBtn.innerHTML = '<span class="icon icon-publish"></span>';
+          decorateIcons(publishBtn);
+          status.append(publishBtn);
+
+          publishBtn.addEventListener('click', () => {
+            confirmPrompt(link.getAttribute('href'), () => {
+              publishBtn.remove();
+              status.textContent = 'Publishing...';
+              fetch(`https://admin.hlx.page/live/${ownerRepoBranch}${link.getAttribute('href')}`, {
+                method: 'POST',
+              }).then((pubResp) => {
+                if (pubResp.ok) {
+                  setTimeout(() => {
+                    updateStatus(row);
+                  }, 5000);
+                }
+              }).catch(() => {
+                status.textContent = 'Publishing Failed!';
+              });
+            });
+          });
         }
       }
     }
@@ -170,9 +236,12 @@ function init(block) {
 
   dialog.showModal();
   document.body.style.overflowY = 'hidden';
-  addOutsideClickListener(dialog.querySelector('.references-dialog-wrapper'), () => {
-    dialog.close();
-    document.body.style.overflowY = null;
+  dialog.addEventListener('click', (event) => {
+    const dialogDimensions = dialog.getBoundingClientRect();
+    if (event.clientX < dialogDimensions.left || event.clientX > dialogDimensions.right
+      || event.clientY < dialogDimensions.top || event.clientY > dialogDimensions.bottom) {
+      closeDialog(dialog);
+    }
   });
 }
 
@@ -201,8 +270,7 @@ export default async function decorate(block) {
   init(block);
   block.querySelector('#references-dialog .references-close').addEventListener('click', () => {
     const dialog = block.querySelector('#references-dialog');
-    dialog.close();
-    document.body.style.overflowY = null;
+    closeDialog(dialog);
   });
 
   window.addEventListener('message', (msg) => {
