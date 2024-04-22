@@ -5,7 +5,12 @@ import { sampleRUM, loadScript } from './aem.js';
 sampleRUM('cwv');
 
 // add more delayed functionality here
-loadScript('https://code.jquery.com/jquery-2.2.4.js').then(() => {
+const loadTBT = async () => {
+  const jq = loadScript('https://code.jquery.com/jquery-2.2.4.js');
+  const react = loadScript('https://unpkg.com/react@18/umd/react.development.js');
+  const reactDom = loadScript('https://unpkg.com/react-dom@18/umd/react-dom.development.js');
+  await Promise.all([jq, react, reactDom]);
   const h1 = document.querySelector('h1');
-  h1.textContent += ': JQ 2.2.4 loaded!';
-});
+  h1.textContent += ' : tbt scripts loaded!';
+};
+loadTBT();
