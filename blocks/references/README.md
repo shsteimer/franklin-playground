@@ -8,7 +8,7 @@ This block is used by the references sidekick plugin to check for page reference
 
 Forms and fragments are discovered based on data attributes, which are rendered by those respective blocks. You may need to update the form/fragment blocks in your project for this to work, see [here](../fragment/fragment.js#L50) and [here](../form/form.js#L94). Links are discovered using a domain check, so any link in the DOM to hlx.page, hlx.live, or a production domain, will be included. This logic is included in [`utils.js`](../../scripts/utils.js#L22)
 
-Once a reference is discovered, an admin api call is triggerred to get it's edit link and publish status. In addition, for fragment references, the document is fetched to get it's title. Additionally, if the reference is not yet publish, a publish icon appears, allowing an author to publish without leaving the current context.
+Once a reference is discovered, an admin api call is triggerred to get it's edit link and publish status. In addition, for fragment references, the document is fetched to get it's title. If the reference is not yet publish, a publish icon appears, allowing an author to publish without leaving the current context.
 
 ### Incoming References
 
